@@ -1,0 +1,49 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Dict
+
+app = FastAPI(
+    title="Vet Clinic API",
+    description="Микросервис ветеринарной клиники для хранения и редактирования данных о собаках.",
+    version="1.0.0"
+)
+
+class Dog(BaseModel):
+    name: str
+    age: int
+    breed: str
+
+# Хранилище (в памяти)
+db: Dict[int, Dog] = {}
+counter = 1
+
+@app.get("/dogs")
+def get_dogs():
+    return db
+
+@app.post("/dogs")
+def create_dog(dog: Dog):
+    global counter
+    db[counter] = dog
+    counter += 1
+    return {"id": counter - 1, "dog": dog}
+
+@app.get("/dogs/{dog_id}")
+def get_dog(dog_id: int):
+    if dog_id not in db:
+        raise HTTPException(status_code=404, detail="Dog not found")
+    return db[dog_id]
+
+@app.put("/dogs/{dog_id}")
+def update_dog(dog_id: int, dog: Dog):
+    if dog_id not in db:
+        raise HTTPException(status_code=404, detail="Dog not found")
+    db[dog_id] = dog
+    return {"updated_id": dog_id, "dog": dog}
+
+@app.delete("/dogs/{dog_id}")
+def delete_dog(dog_id: int):
+    if dog_id not in db:
+        raise HTTPException(status_code=404, detail="Dog not found")
+    del db[dog_id]
+    return {"deleted_id": dog_id}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Vet Clinic API</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+    }
+    main {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+        color: #4CAF50;
+    }
+    form input {
+        padding: 8px;
+        margin: 5px;
+        width: calc(100% - 20px);
+    }
+    form button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+        border-radius: 4px;
+    }
+    form button:hover {
+        background-color: #45a049;
+    }
+    .dog-card {
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 10px;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        background-color: #fafafa;
+    }
+    .dog-card img {
+        max-width: 100px;
+        border-radius: 6px;
+        margin-right: 15px;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Vet Clinic API — Список собак</h1>
+</header>
+
+<main>
+    <section>
+        <h2>Добавить собаку</h2>
+        <form id="dogForm">
+            <input type="text" id="name" placeholder="Кличка" required><br>
+            <input type="number" id="age" placeholder="Возраст" required><br>
+            <input type="url" id="photo" placeholder="URL фото" required><br>
+            <button type="submit">Добавить</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Список собак</h2>
+        <div id="dogList"></div>
+    </section>
+</main>
+
+<script>
+const dogForm = document.getElementById('dogForm');
+const dogList = document.getElementById('dogList');
+
+// Загрузка данных из localStorage
+let dogs = JSON.parse(localStorage.getItem('dogs')) || [];
+
+function renderDogs() {
+    dogList.innerHTML = '';
+    dogs.forEach((dog, index) => {
+        const card = document.createElement('div');
+        card.className = 'dog-card';
+        card.innerHTML = `
+            <img src="${dog.photo}" alt="${dog.name}">
+            <div>
+                <strong>Кличка:</strong> ${dog.name}<br>
+                <strong>Возраст:</strong> ${dog.age} лет
+            </div>
+        `;
+        dogList.appendChild(card);
+    });
+}
+
+dogForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const age = document.getElementById('age').value.trim();
+    const photo = document.getElementById('photo').value.trim();
+    if(name && age && photo) {
+        const newDog = {name, age, photo};
+        dogs.push(newDog);
+        localStorage.setItem('dogs', JSON.stringify(dogs));
+        renderDogs();
+        dogForm.reset();
+    }
+});
+
+// Первоначальный рендер
+renderDogs();
+</script>
+
+</body>
+</html>
